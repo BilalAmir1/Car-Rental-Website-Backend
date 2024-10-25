@@ -1,0 +1,72 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("DATEBASE_URL")
+}
+
+model User {
+    id         String    @id @default(auto()) @map("_id") @db.ObjectId
+    name       String?
+    email      String    @unique
+    image      String?
+    rentedCars Json[]
+    favCarsID  String[]  @db.ObjectId
+    bookings   Booking[]
+}
+
+model Car {
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
+    name         String
+    year         Int
+    color        String
+    brand        String
+    transmission String
+    costPerHour  Int
+    imgUrl       String
+    address      String
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+
+    @@unique(fields: [address])
+}
+
+model Admin {
+    id       String  @id @default(auto()) @map("_id") @db.ObjectId
+    name     String?
+    email    String  @unique
+    password String
+}
+
+model Blog {
+    id          String   @id @default(auto()) @map("_id") @db.ObjectId
+    title       String
+    author      String
+    date        DateTime @default(now())
+    imgUrl      String
+    description String
+    quote       String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}
+
+model Booking {
+    id            String   @id @default(auto()) @map("_id") @db.ObjectId
+    carId         String
+    userEmail     String
+    startDate     String
+    endDate       String
+    address       String
+    phoneNumber   String
+    totalHours    Int
+    totalAmount   Int
+    transactionId String
+    isCompleted   Boolean  @default(false)
+    user          User     @relation(fields: [userEmail], references: [email])
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    @@unique([carId, userEmail, startDate, endDate])
+}
